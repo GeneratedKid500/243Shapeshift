@@ -100,7 +100,7 @@ public class PickUpObject : MonoBehaviour
                 pickedObject = hit.transform.GetComponent<Pickable>();
                 pickedObject.GetPickedUp();
                 reticle.enabled = false;
-                shift.SetObject(ref pickedObject);
+                //shift.SetObject(ref pickedObject);
 
                 Debug.Log("HitObject!");
             }

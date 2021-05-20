@@ -2,48 +2,41 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(Rigidbody))]
+[RequireComponent (typeof(Rigidbody))]
 [RequireComponent(typeof(BoxCollider))]
 [RequireComponent(typeof(SphereCollider))]
 [RequireComponent(typeof(CapsuleCollider))]
-public class Pickable : MonoBehaviour
+public class Interactable : MonoBehaviour
 {
-    float minSpeed;
-    float maxSpeed;
-    float rotSpeed;
+    [Header("Physics Stats")]
+    public bool pickedUp = false;
+    [HideInInspector] public PlayerInteraction playerInteractions;
+    [HideInInspector] public Rigidbody rb;
+    public float throwForce = 10f;
+    public float breakOffForce = 35f;
 
+    [Header("Respawn Point")]    
+    public GameObject respawnPoint;
+    public int deathPoint = -100;
+
+    [Header("Shape Shifting")]
+    //shape
+    public int activeShape = 0;
+    MeshFilter meshFilter;
+    Collider[] col;
+    //scale
+    public Vector3 baseSize = new Vector3(.6f, .6f, .6f);
     Vector3 minSize;
     Vector3 maxSize;
     Vector3 curSize;
 
-    MeshFilter meshFilter;
-    Collider[] col;
-    Transform player;
-    Rigidbody rb;
-
-    [Header("Currently Active Object")]
-    public int activeShape = 0;
-
-    Quaternion lookRot;
-
-    float currentDist;
-    float maxDist;
-
-    float currentSpeed;
-
-    bool isHolding = false;
-
-    Vector3 pickPos;
-
-    [Header("Variables")]
-    public float throwForce = 10;
-
-    void Start()
+    private void Start()
     {
-        player = Camera.main.transform;
-
+        //stats
+        playerInteractions = GameObject.FindGameObjectWithTag("Player").GetComponentInChildren<PlayerInteraction>();
         rb = GetComponent<Rigidbody>();
-
+        
+        //shapes
         meshFilter = GetComponent<MeshFilter>();
         col = GetComponents<Collider>();
         CapsuleCollider tCol = col[2].GetComponent<CapsuleCollider>();
@@ -52,70 +45,45 @@ public class Pickable : MonoBehaviour
         col[2] = tCol;
         SetMesh(meshFilter.mesh);
 
+        //scale
         curSize = transform.localScale;
         minSize = new Vector3(0.3f, 0.3f, 0.3f);
         maxSize = new Vector3(1.3f, 1.3f, 1.3f);
     }
 
-    void FixedUpdate()
+    private void Update()
     {
-        if (isHolding)
-            transform.localPosition = pickPos;
-    }
-
-    public void GetPickedUp()
-    {
-        transform.SetParent(player);
-        rb.velocity = Vector3.zero;
-        rb.angularVelocity = Vector3.zero;
-
-        pickPos = transform.localPosition;
-
-        rb.useGravity = false;
-        rb.isKinematic = true;
-
-        isHolding = true;
-
-        rb.constraints = RigidbodyConstraints.FreezeRotation;
-    }
-
-    public void GetDropped()
-    {
-        transform.SetParent(null);
-        rb.useGravity = true;
-
-        rb.isKinematic = false;
-        isHolding = false;
-
-        rb.constraints = RigidbodyConstraints.None;
-    }
-
-    public void GetThrown()
-    {
-        transform.SetParent(null);
-        rb.constraints = RigidbodyConstraints.None;
-        rb.useGravity = true;
-        rb.isKinematic = false;
-        isHolding = false;
-        rb.AddForce(player.forward * throwForce, ForceMode.Impulse);
-    }
-
-    public void UpdateRot(Transform newLoc)
-    {
-        lookRot = Quaternion.LookRotation(player.position - transform.position);
-
-        if (transform.rotation != lookRot)
+        if (transform.position.y < deathPoint)
         {
-            pickPos = newLoc.localPosition;
-            rb.MoveRotation(lookRot);
+            transform.localScale = baseSize;
+            Instantiate<GameObject>(this.gameObject, respawnPoint.transform.position, Quaternion.identity);
+            Destroy(this.gameObject);
         }
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (pickedUp)
+        {
+            if (collision.relativeVelocity.magnitude > breakOffForce)
+            {
+                playerInteractions.DropObj();
+                StartCoroutine(playerInteractions.RedReticle());
+            }
+        }
+    }
+
+    public IEnumerator PickUp()
+    {
+        yield return new WaitForSecondsRealtime(0.2f);
+        pickedUp = true;
     }
 
     //change shape
     public void SetMesh(Mesh mesh)
     {
         meshFilter.mesh = mesh;
-        switch (activeShape) 
+        switch (activeShape)
         {
             case 0:
                 col[0].enabled = true;
@@ -148,7 +116,6 @@ public class Pickable : MonoBehaviour
                 col[2].enabled = false;
                 break;
         }
-
     }
 
     public void ScaleMesh(float increase)

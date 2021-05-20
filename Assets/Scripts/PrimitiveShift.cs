@@ -4,11 +4,11 @@ using UnityEngine;
 
 public class PrimitiveShift : MonoBehaviour
 {
-    Pickable picked;
+    public Interactable picked;
 
     public Mesh[] shapes;
 
-    public void SetObject(ref Pickable pickedRef)
+    public void SetObject(ref Interactable pickedRef)
     {
         picked = pickedRef;
         picked.SetMesh(shapes[picked.activeShape]);
