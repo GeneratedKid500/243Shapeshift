@@ -46,6 +46,15 @@ public class PressurePlate : MonoBehaviour
             audioSource.PlayOneShot(down);
         }
 
+        foreach (string tag in onBoardTags)
+        {
+            if (tag == obj.tag)
+            {
+                onBoardTags.Remove(obj.tag);
+                totalOnBoard--;
+                break;
+            }
+        }
         onBoardTags.Add(obj.tag);
 
         if (acceptedTags.Length > 0)
@@ -56,7 +65,6 @@ public class PressurePlate : MonoBehaviour
                 {
                     correctObj = true;
                     break;
-
                 }
             }
         }

@@ -6,6 +6,8 @@ TagManager:
   tags:
   - RespawnPoint
   - GenericPickup
+  - LargeCapsule1B
+  - SecretArea
   layers:
   - Default
   - TransparentFX

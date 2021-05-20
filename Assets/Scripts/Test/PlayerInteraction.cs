@@ -141,7 +141,7 @@ public class PlayerInteraction : MonoBehaviour
         rayPos = mainCam.ScreenToWorldPoint(new Vector3(Screen.width / 2, Screen.height / 2, 0));
         RaycastHit hit;
         if (Physics.SphereCast(rayPos, castRadius, mainCam.transform.forward, out hit, maxDist / 2, interactableLayer))
-            lookObj = hit.collider.transform.root.gameObject;
+            lookObj = hit.collider.transform.gameObject;
         else
             lookObj = null;
     }

@@ -18,6 +18,8 @@ public class FPControl : MonoBehaviour
     float crouchHeight;
     float crouchTimer;
     bool crouching;
+    //respawn
+    Vector3 startingPos;
 
     [Header("Jumping")]
     [SerializeField] float jumpForce = 220;
@@ -27,12 +29,12 @@ public class FPControl : MonoBehaviour
     public LayerMask groundedMask;
 
     [Header("Camera Rotation")]
-    Transform cameraT;
-    float verticalLookRotation;
     [SerializeField] float mouseSensitivityX = 250f;
     [SerializeField] float mouseSensitivityY = 250f;
     [SerializeField] float MinRotationY = -60f;
     [SerializeField] float MaxRotationY = 60f;
+    Transform cameraT;
+    float verticalLookRotation;
 
     [Header("Stairs")]
     public bool enableStairs;
@@ -53,6 +55,8 @@ public class FPControl : MonoBehaviour
 
     void Start()
     {
+        startingPos = transform.position;
+
         cameraT = Camera.main.transform; //gets camera's transform
         cameraT.parent = this.transform;
         cameraT.localPosition = new Vector3(0, 0.5f);
@@ -91,6 +95,13 @@ public class FPControl : MonoBehaviour
 
         ////Jump
         JUMP();
+
+        if (transform.position.y < -100)
+        {
+            rb.velocity = Vector3.zero;
+            transform.rotation = Quaternion.identity;
+            transform.position = startingPos;
+        }
     }
 
     void FixedUpdate()
