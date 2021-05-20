@@ -14,6 +14,11 @@ public class PrimitiveShift : MonoBehaviour
         picked.SetMesh(shapes[picked.activeShape]);
     }
 
+    public void DeSetObject()
+    {
+        picked = null;
+    }
+
     public void ScrollShift(float direction)
     {
         //Debug.Log(direction);

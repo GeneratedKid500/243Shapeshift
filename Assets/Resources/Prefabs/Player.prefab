@@ -400,7 +400,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1599235252}
   - component: {fileID: 1599235255}
-  - component: {fileID: 1599235254}
   - component: {fileID: 1599235253}
   m_Layer: 10
   m_Name: Camera
@@ -466,14 +465,6 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
---- !u!81 &1599235254
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1599235251}
-  m_Enabled: 1
 --- !u!114 &1599235253
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -931,7 +922,7 @@ MonoBehaviour:
     m_Bits: 257
   mouseSensitivityX: 500
   mouseSensitivityY: 500
-  MinRotationY: -60
+  MinRotationY: -80
   MaxRotationY: 60
   enableStairs: 1
   stepRayUpper: {fileID: 4493553444943267022}

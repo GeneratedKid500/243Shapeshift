@@ -12,7 +12,7 @@ public class PlayerInteraction : MonoBehaviour
     public GameObject lookObj;
     Interactable interactable;
     Camera mainCam;
-    PrimitiveShift shift;
+    [HideInInspector] public PrimitiveShift shift;
 
     [Header("Pickup")]
     public Transform pickupParent;
@@ -206,7 +206,7 @@ public class PlayerInteraction : MonoBehaviour
         UpdateHotBar();
     }
 
-
+    #region UpdateReticle
     void UpdateReticle()
     {
         if (reticle.color != Color.red)
@@ -220,7 +220,7 @@ public class PlayerInteraction : MonoBehaviour
                 reticle.color = baseReticle;
             }
         }
-        #region Reticle Enumerator
+
     }
 
     public IEnumerator RedReticle()
@@ -228,9 +228,10 @@ public class PlayerInteraction : MonoBehaviour
         reticle.color = Color.red;
         yield return new WaitForSecondsRealtime(0.3f);
         reticle.color = baseReticle;
-        #endregion
+
     }
-    
+    #endregion
+
     void UpdateHotBar()
     {
         if (!currentlyPickedUp)

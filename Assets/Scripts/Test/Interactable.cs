@@ -8,6 +8,11 @@ using UnityEngine;
 [RequireComponent(typeof(CapsuleCollider))]
 public class Interactable : MonoBehaviour
 {
+    [Header("Object Stats")]
+    public bool shiftable = true;
+    public bool scaleable = true;
+    public bool respawnable = true;
+
     [Header("Physics Stats")]
     public bool pickedUp = false;
     [HideInInspector] public PlayerInteraction playerInteractions;
@@ -22,6 +27,7 @@ public class Interactable : MonoBehaviour
     [Header("Shape Shifting")]
     //shape
     public int activeShape = 0;
+    int startingShape;
     MeshFilter meshFilter;
     Collider[] col;
     //scale
@@ -32,6 +38,12 @@ public class Interactable : MonoBehaviour
 
     private void Start()
     {
+        gameObject.layer = 9;
+        if (!respawnPoint)
+        {
+            respawnPoint = GameObject.FindGameObjectWithTag("RespawnPoint");
+        }
+         
         //stats
         playerInteractions = GameObject.FindGameObjectWithTag("Player").GetComponentInChildren<PlayerInteraction>();
         rb = GetComponent<Rigidbody>();
@@ -39,11 +51,16 @@ public class Interactable : MonoBehaviour
         //shapes
         meshFilter = GetComponent<MeshFilter>();
         col = GetComponents<Collider>();
+
         CapsuleCollider tCol = col[2].GetComponent<CapsuleCollider>();
         tCol.height = 2;
         tCol.radius = 0.5f;
         col[2] = tCol;
-        SetMesh(meshFilter.mesh);
+
+        Interactable instance = this;
+        playerInteractions.shift.SetObject(ref instance);
+        playerInteractions.shift.NumShift(activeShape);
+        startingShape = activeShape;
 
         //scale
         curSize = transform.localScale;
@@ -55,9 +72,21 @@ public class Interactable : MonoBehaviour
     {
         if (transform.position.y < deathPoint)
         {
-            transform.localScale = baseSize;
-            Instantiate<GameObject>(this.gameObject, respawnPoint.transform.position, Quaternion.identity);
-            Destroy(this.gameObject);
+            if (respawnable)
+            {
+                transform.localScale = baseSize;
+                curSize = baseSize;
+                rb.velocity = Vector3.zero;
+                transform.rotation = Quaternion.identity;
+                transform.position = respawnPoint.transform.position;
+            }
+            else
+            {
+                gameObject.SetActive(false);
+                Debug.Log("Destroyed");
+                Destroy(this.gameObject);
+            }
+
         }
     }
 
@@ -82,7 +111,22 @@ public class Interactable : MonoBehaviour
     //change shape
     public void SetMesh(Mesh mesh)
     {
-        meshFilter.mesh = mesh;
+        if (shiftable)
+        {
+            meshFilter.mesh = mesh;
+            SwitchActive();
+        }
+        else
+        {
+            Debug.Log("Unshiftable");
+            activeShape = startingShape;
+            SwitchActive();
+        }
+
+    }
+
+    void SwitchActive()
+    {
         switch (activeShape)
         {
             case 0:
@@ -120,34 +164,57 @@ public class Interactable : MonoBehaviour
 
     public void ScaleMesh(float increase)
     {
-        Vector3 vIncrease = new Vector3(increase, increase, increase);
-        if (increase > 0)
+        if (scaleable)
         {
-            if (curSize.y < maxSize.y)
+            Vector3 vIncrease = new Vector3(increase, increase, increase);
+            if (increase > 0)
             {
-                curSize += vIncrease;
-                transform.localScale = curSize;
+                if (curSize.y < maxSize.y)
+                {
+                    curSize += vIncrease;
+                    transform.localScale = curSize;
+                }
+                else
+                {
+                    Debug.Log("Max Size");
+                }
+            }
+            else if (increase < 0)
+            {
+                if (curSize.y > minSize.y)
+                {
+                    curSize += vIncrease;
+                    transform.localScale = curSize;
+                }
+                else
+                {
+                    Debug.Log("Min Size");
+                }
             }
             else
             {
-                Debug.Log("Max Size");
-            }
-        }
-        else if (increase < 0)
-        {
-            if (curSize.y > minSize.y)
-            {
-                curSize += vIncrease;
-                transform.localScale = curSize;
-            }
-            else
-            {
-                Debug.Log("Min Size");
+                Debug.Log(this + ": Scale Error");
             }
         }
         else
         {
-            Debug.Log(this + ": Scale Error");
+            Debug.Log("UnScaleable");
         }
+    }
+
+    public void SetUnscaleable(bool set)
+    {
+        scaleable = set;
+    }
+
+    public void SetUnshiftable(bool set)
+    {
+        shiftable = set;
+        activeShape = startingShape;
+    }
+
+    public void SetRespawnable(bool set)
+    {
+        respawnable = set;
     }
 }
