@@ -27,7 +27,7 @@ public class PressurePlate : MonoBehaviour
 
     private void Start()
     {
-        startingPos = transform.position;
+        startingPos = transform.localPosition;
         correctPos = new Vector3(startingPos.x, startingPos.y / 10, startingPos.z);
 
         onBoardTags = new List<string>();
@@ -40,6 +40,14 @@ public class PressurePlate : MonoBehaviour
 
     private void OnTriggerEnter(Collider obj)
     {
+        if (tag == "CylinderPad")
+        {
+            if (!(obj is SphereCollider))
+            {
+                return;
+            }
+        }
+
         totalOnBoard++;
         if (totalOnBoard == 1 && !audioSource.isPlaying)
         {
@@ -119,7 +127,7 @@ public class PressurePlate : MonoBehaviour
     {
         if (totalOnBoard > 0)
         {
-            transform.position = Vector3.MoveTowards(transform.position, correctPos, Time.fixedDeltaTime);
+            transform.localPosition = Vector3.MoveTowards(transform.localPosition, correctPos, Time.fixedDeltaTime);
             if (correctObj)
             {
                 StartCoroutine(ColourChange(green));
@@ -131,7 +139,7 @@ public class PressurePlate : MonoBehaviour
         }
         else if (totalOnBoard == 0) 
         {
-            transform.position = Vector3.MoveTowards(transform.position, startingPos, Time.fixedDeltaTime);
+            transform.localPosition = Vector3.MoveTowards(transform.localPosition, startingPos, Time.fixedDeltaTime);
             StartCoroutine(ColourChange(baseMat));
         }
     }

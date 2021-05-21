@@ -5,6 +5,7 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody))]
 public class FPControl : MonoBehaviour
 {
+    public static float timer;
     Rigidbody rb;
     CapsuleCollider pCollider;
 
@@ -91,21 +92,17 @@ public class FPControl : MonoBehaviour
         //passes current velocity as a ref to ensure it gets updated
 
         //CROUCHING
-        Crouch();
+        CROUCH();
 
         ////Jump
         JUMP();
 
-        if (transform.position.y < -100)
-        {
-            rb.velocity = Vector3.zero;
-            transform.rotation = Quaternion.identity;
-            transform.position = startingPos;
-        }
+        QUIT();
     }
 
     void FixedUpdate()
     {
+        timer += Time.fixedDeltaTime;
         grounded = isGrounded(); //updates is grounded
 
         ////STAIRCLIMB
@@ -127,6 +124,8 @@ public class FPControl : MonoBehaviour
     private void LateUpdate()
     {
         cameraT.localEulerAngles = Vector3.left * verticalLookRotation; //adjusts camera travsform using realtive euler angles
+
+        CheckDeathBarrier();
     }
 
     void CAMERA() //camera movement (including player on x val)
@@ -140,7 +139,7 @@ public class FPControl : MonoBehaviour
         verticalLookRotation = Mathf.Clamp(verticalLookRotation, MinRotationY, MaxRotationY);
     }
 
-    void Crouch() //gets crouch input
+    void CROUCH() //gets crouch input
     {
         if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.C) || Input.GetKeyDown(KeyCode.LeftControl))
         {
@@ -210,5 +209,24 @@ public class FPControl : MonoBehaviour
         else
             return false;
     }
+
+    void CheckDeathBarrier()
+    {
+        if (transform.position.y < -100)
+        {
+            rb.velocity = Vector3.zero;
+            transform.rotation = Quaternion.identity;
+            transform.position = startingPos;
+        }
+    }
+
+    void QUIT()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Application.Quit();
+        }
+    }
 }
+
 

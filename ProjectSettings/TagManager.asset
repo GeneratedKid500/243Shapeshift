@@ -8,6 +8,12 @@ TagManager:
   - GenericPickup
   - LargeCapsule1B
   - SecretArea
+  - TwoAtOnce
+  - BackDoor
+  - CylinderPad
+  - HiddenBall
+  - TheHiddenOne
+  - SuperSecretArea
   layers:
   - Default
   - TransparentFX
